@@ -1,0 +1,45 @@
+CREATE FUNCTION get_odoo_data(account_code text, cuenta text, aml_date date)
+RETURNS TABLE(
+    id integer,
+    ref text,
+        payment_id integer,
+    origen text,
+    tipo text,
+    date date,
+    cuenta text,
+    ref_name text,
+    rut text,
+    name text,
+    amount numeric,
+    code text,
+    gonchi_id text
+)
+AS $$
+WITH odoo AS (
+    SELECT aml.id,
+           aml.ref,
+           REGEXP_MATCHES(aml.ref, '\d+') AS number_only,
+           'ODOO' AS origen,
+           'PD' AS tipo,
+           aml.date,
+           $2 AS cuenta,       -- Replace 'bciLTC3543' with parameter
+           aml.move_name AS ref_name,
+           res_partner.vat AS rut,
+           res_partner.name AS name,
+           balance AS amount,
+           account_account.code,
+           balance::text || $2 || aml.date::date::text || 'PD' AS gonchi_id
+    FROM account_move_line aml
+    INNER JOIN account_account ON aml.account_id = account_account.id
+    LEFT JOIN res_partner ON aml.partner_id = res_partner.id
+    WHERE aml.date >= $3  -- Use aml_date parameter
+      AND balance > 0
+      AND account_account.code = $1  -- Replace '111143' with parameter
+      AND parent_state = 'posted'
+      AND aml.ref LIKE '%Pago%'
+)
+SELECT o.id, o.ref, (number_only[1])::int AS payment_id,
+o.origen, o.tipo, o.date, o.cuenta, o.ref_name, 
+o.rut, o.name, o.amount, o.code, o.gonchi_id
+FROM odoo o;
+$$ LANGUAGE SQL;
