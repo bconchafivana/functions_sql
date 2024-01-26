@@ -1,0 +1,6 @@
+Select  ct.TipoDocumento ,
+sum(ct.MontoDocumento - ct.MontoFinanciado + ct.SaldoCliente) as saldo,
+sum(ct.NoFinanciado) as NoFinanciado-- Empresa, sum(FIU)
+from ct.CarterasTotales ct 
+where Pais = 'CL' and Empresa IN ('INC') and FechaCorte = '2023-12-31'
+group by ct.TipoDocumento
