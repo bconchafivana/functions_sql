@@ -1,4 +1,4 @@
-SELECT Cta_Codigo,sum(dco_valor) as dco_valor ,
+SELECT Cta_Codigo, Comprobante.Com_Periodo, sum(dco_valor) as dco_valor ,
 case when Cta_Codigo IN ('11130602',
 '11130603',
 '11130604',
@@ -110,11 +110,10 @@ WHERE Cta_Codigo IN ('11130602',
 '11135701'
 )
 and Dco_TipoDH = 'D'
-AND Comprobante.Com_Fecha >= '20230101'
-AND Comprobante.Com_Fecha <= '20231231'
-GROUP BY Cta_Codigo
+AND Comprobante.Com_Fecha >= '20230701'
+GROUP BY Cta_Codigo, Comprobante.Com_Periodo 
 UNION 
-SELECT Cta_Codigo,sum(dco_valor) as dco_valor ,
+SELECT Cta_Codigo, Comprobante.Com_Periodo, sum(dco_valor) as dco_valor ,
 case when Cta_Codigo IN ('11130602',
 '11130603',
 '11130604',
@@ -226,6 +225,5 @@ WHERE Cta_Codigo IN ('11130602',
 '11135701'
 )
 and Dco_TipoDH = 'H'
-AND Comprobante.Com_Fecha >= '20230101'
-AND Comprobante.Com_Fecha <= '20231231'
-GROUP BY Cta_Codigo
+AND Comprobante.Com_Fecha >= '20230701'
+GROUP BY Cta_Codigo, Comprobante.Com_Periodo
