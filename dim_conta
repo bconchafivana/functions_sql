@@ -1,4 +1,11 @@
-SELECT Cta_Codigo, Comprobante.Com_Periodo, sum(dco_valor) as dco_valor ,
+CREATE FUNCTION contab_values (
+@StartDate as VARCHAR(10),
+@EndDate as VARCHAR(10)
+)
+RETURNS TABLE AS
+RETURN 
+(
+SELECT Cta_Codigo as cta_codigo,sum(dco_valor) as dco_valor ,
 case when Cta_Codigo IN ('11130602',
 '11130603',
 '11130604',
@@ -110,10 +117,12 @@ WHERE Cta_Codigo IN ('11130602',
 '11135701'
 )
 and Dco_TipoDH = 'D'
-AND Comprobante.Com_Fecha >= '20230701'
-GROUP BY Cta_Codigo, Comprobante.Com_Periodo 
+and Comprobante.Com_Estado = 'T'
+AND Comprobante.Com_Periodo >= @StartDate
+AND Comprobante.Com_Periodo <= @EndDate
+GROUP BY Cta_Codigo
 UNION 
-SELECT Cta_Codigo, Comprobante.Com_Periodo, sum(dco_valor) as dco_valor ,
+SELECT Cta_Codigo,sum(dco_valor) as dco_valor ,
 case when Cta_Codigo IN ('11130602',
 '11130603',
 '11130604',
@@ -225,5 +234,8 @@ WHERE Cta_Codigo IN ('11130602',
 '11135701'
 )
 and Dco_TipoDH = 'H'
-AND Comprobante.Com_Fecha >= '20230701'
-GROUP BY Cta_Codigo, Comprobante.Com_Periodo
+and Comprobante.Com_Estado = 'T'
+AND Comprobante.Com_Periodo >= @StartDate
+AND Comprobante.Com_Periodo <= @EndDate
+GROUP BY Cta_Codigo
+)
