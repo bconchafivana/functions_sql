@@ -1,0 +1,36 @@
+
+create function contab_values (
+@StartDate as Varchar(10),
+@EndDate as Varchar(10)
+)
+Returns table as 
+Return 
+(
+SELECT Cta_Codigo as cta_codigo,sum(dco_valor) as dco_valor ,
+'Cartera' as tipo,
+'D' as mov
+FROM Comprobante
+INNER JOIN Detalle_Comprobante ON Detalle_Comprobante.Tdc_Tipo = Comprobante.Tdc_Tipo AND Comprobante.Tdc_Tipo = Detalle_Comprobante.Tdc_Tipo 
+AND Comprobante.Com_Numero = Detalle_Comprobante.Com_Numero AND Comprobante.Com_Periodo = Detalle_Comprobante.Com_Periodo
+WHERE Cta_Codigo IN ('11041001', '11041002', '11041003', '11041004',
+'21071001', '21071002','21071003', '21071004')
+and Comprobante.Tdc_Tipo = 'D'
+and Comprobante.Com_Estado = 'T'
+AND Comprobante.Com_Periodo >= @StartDate
+AND Comprobante.Com_Periodo <= @EndDate
+GROUP BY Cta_Codigo
+UNION 
+SELECT Cta_Codigo,sum(dco_valor) as dco_valor ,
+'Cartera' as tipo, 
+'H' as mov
+FROM Comprobante
+INNER JOIN Detalle_Comprobante ON Detalle_Comprobante.Tdc_Tipo = Comprobante.Tdc_Tipo AND Comprobante.Tdc_Tipo = Detalle_Comprobante.Tdc_Tipo 
+AND Comprobante.Com_Numero = Detalle_Comprobante.Com_Numero AND Comprobante.Com_Periodo = Detalle_Comprobante.Com_Periodo
+WHERE Cta_Codigo IN ('11041001', '11041002', '11041003', '11041004',
+'21071001', '21071002','21071003', '21071004')
+and Comprobante.Tdc_Tipo = 'H'
+and Comprobante.Com_Estado = 'T'
+AND Comprobante.Com_Periodo >= @StartDate
+AND Comprobante.Com_Periodo <= @EndDate
+GROUP BY Cta_Codigo
+)
